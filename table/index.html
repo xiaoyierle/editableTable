@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>异步的可编辑表格</title>
+    <link rel="stylesheet" href="../css/bootstrap.css">
+    <style>
+        #add{
+            cursor: pointer;
+        }
+        .del{
+            cursor: pointer;
+            color: blue;
+        }
+        table{
+            table-layout: fixed;
+        }
+        .progress{
+            width:0;
+            height:10px;
+            background: red;
+            box-shadow: 0 0 5px red;
+            position: fixed;
+            top:0;
+            left:0;
+        }
+    </style>
+</head>
+<body>
+<div class="progress"></div>
+<div class="container">
+    <div class="col-sm-6 col-sm-offset-3">
+        <table class="table table-bordered">
+            <caption class="text-center">学生信息管理表</caption>
+            <thead>
+            <tr class="success">
+                <th>姓名</th>
+                <th>年龄</th>
+                <th>性别</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="4" class="text-center" id="add">add</td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+</body>
+<script src="../js/jQuery1.10.2.js"></script>
+<script>
+    //增加
+    $("#add").click(function(){
+        $.get("insert.php",function(r){
+            if(r==1){
+                alert("插入成功");
+                select();
+            }else{
+                alert("插入失败");
+            }
+        })
+    });
+    //获取
+    function select(){
+        $.get("select.php",function(r){
+            var str='';
+            $.each(r,function(index,value){
+                str+=`
+                       <tr id="${value.id}">
+                        <td contenteditable="true" onblur="change(this)" data-row="name">${value.name}</td>
+                        <td contenteditable="true" onblur="change(this)" data-row="age">${value.age}</td>
+                        <td contenteditable="true" onblur="change(this)" data-row="sex">${value.sex}</td>
+                        <td class="del text-center danger">删除</td>
+                        </tr>
+                    `;
+            });
+            $("tbody").html(str);
+        },"json");
+    }
+    select();
+    //删除
+    $("tbody").on("click",".del",function(){
+        var index=$(this).parent().attr("id");
+        $.get("delete.php",{id:index},function(r){
+            if(r==1){
+                alert("删除成功");
+                select();
+            }
+            else{
+                alert("删除失败");
+            }
+        });
+    });
+    //修改
+    //window.change 把change绑定到window对象中，解决作用域的问题
+    window.change=function(ele){
+        var index=$(ele).parent().attr('id');
+        var attr=$(ele).attr("data-row");
+        var val=$(ele).html();
+        $.get("update.php",{id:index,attr:attr,val:val},function(r){
+            if(r==1){
+                alert("修改成功");
+                select();
+            }else{
+                alert("修改失败");
+            }
+        })
+    }
+</script>
+</html>

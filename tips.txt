@@ -1,0 +1,5 @@
+可编辑表格
+数据库信息在db.php中
+数据库名称为db
+表名为user
+有四个字段 id name age sex
