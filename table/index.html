@@ -30,12 +30,13 @@
 <div class="progress"></div>
 <div class="container">
     <div class="col-sm-6 col-sm-offset-3">
+        <input type="search" id="search" placeholder="输入姓名查询">
         <table class="table table-bordered">
             <caption class="text-center">学生信息管理表</caption>
             <thead>
             <tr class="success">
                 <th>姓名</th>
-                <th>年龄</th>
+                <th><a href="javascript:;" id="age">年龄</a></th>
                 <th>性别</th>
                 <th>操作</th>
             </tr>
@@ -67,9 +68,20 @@
     //获取
     function select(){
         $.get("select.php",function(r){
-            var str='';
-            $.each(r,function(index,value){
-                str+=`
+            /*r.sort(function(a,b){
+                if(a.age>b.age){
+                    return 1;
+                }else{
+                    return -1;
+                }
+            })*///前台排序
+        write(r);
+        },"json");
+    }
+    function write(r){
+        var str='';
+        $.each(r,function(index,value){
+            str+=`
                        <tr id="${value.id}">
                         <td contenteditable="true" onblur="change(this)" data-row="name">${value.name}</td>
                         <td contenteditable="true" onblur="change(this)" data-row="age">${value.age}</td>
@@ -77,9 +89,8 @@
                         <td class="del text-center danger">删除</td>
                         </tr>
                     `;
-            });
-            $("tbody").html(str);
-        },"json");
+        });
+        $("tbody").html(str);
     }
     select();
     //删除
@@ -110,5 +121,26 @@
             }
         })
     }
+    var flag=true;
+    $("#age").click(function(){
+        if(flag){
+            $.get("select.php",{order:"desc"},function(r){
+                //desc表示降序的意思
+                write(r);
+            },"json");
+            flag=!flag;
+        }else{
+            $.get("select.php",{order:"asc"},function(r){
+                //desc表示降序的意思
+                write(r);
+            },"json");
+            flag=!flag;
+        }
+    });
+    $("#search").blur(function () {
+        $.get("select.php",{sname:$(this).val()},function(r){
+            write(r)
+        },"json");
+    })
 </script>
 </html>

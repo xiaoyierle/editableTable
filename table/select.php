@@ -6,8 +6,17 @@
  * Time: 9:10
  */
 include "db.php";
-//$sql="select * form student";
-$sql="select * from student";
+error_reporting(0);
+$order=$_GET["order"];
+$sname=$_GET["sname"];
+if(isset($order)){
+    $sql="select * from student order by age $order";
+    //asc 升序排列  desc 降序排列
+}else if(isset($sname)){
+    $sql="select * from student where name like '%$sname%' order by id";
+}else{
+    $sql="select * from student order by id asc";
+}
 $result=$db->query($sql);
 $r=$result->fetch_all(MYSQLI_ASSOC);
 //MYSQLI_ASSOC 查询结果是一个索引数组类型
